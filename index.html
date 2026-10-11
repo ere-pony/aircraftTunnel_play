@@ -3,6 +3,17 @@
 <head>
   <meta charset="utf-8">
 
+  <!-- 旧安卓 WebView（Chromium<93，国内系统 WebView 常见）缺 ES2022 的 Object.hasOwn：
+       @telegram-apps/bridge 解析 tgWebApp* 启动参数时抛 hasOwn is not a function，
+       SDK init 失败导致 Telegram 原生全屏通道整体丢失。先于所有脚本 polyfill。 -->
+  <script>
+    if (!Object.hasOwn) {
+      Object.hasOwn = function (obj, prop) {
+        return Object.prototype.hasOwnProperty.call(obj, prop);
+      };
+    }
+  </script>
+
   <!-- Telegram Mini App SDK：官方要求置于 <head> 且先于其它脚本引入，保证打开即
        ready/expand/原生全屏（游戏代码经 body 末尾注入，另行动态补载兜底；非 Telegram
        环境加载后仅为无 initData 的空实例，无副作用）。 -->
